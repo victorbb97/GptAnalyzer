@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Análise de Currículo - OpenAI</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      text-align: center;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      margin-bottom: 2rem;
+      color: #333;
+    }
+    form {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      display: inline-block;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input[type="file"] {
+      margin-bottom: 1rem;
+    }
+    button {
+      padding: 0.5rem 1.5rem;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #response {
+      margin-top: 2rem;
+      white-space: pre-wrap;
+      text-align: left;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      background: white;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    #loading {
+      margin-top: 2rem;
+      font-style: italic;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>Envie seu Currículo em PDF</h1>
+
+  <form id="upload-form" enctype="multipart/form-data">
+    <input type="file" id="pdfFile" name="pdf" accept="application/pdf" required><br>
+    <button type="submit">Enviar para Análise</button>
+  </form>
+
+  <div id="loading" style="display: none;">Analisando currículo, aguarde...</div>
+  <div id="response"></div>
+
+  <script>
+    const form = document.getElementById('upload-form');
+    const responseDiv = document.getElementById('response');
+    const loadingDiv = document.getElementById('loading');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      responseDiv.textContent = ''; // Limpar resposta anterior
+      loadingDiv.style.display = 'block'; // Mostrar "analisando..."
+
+      const formData = new FormData();
+      const fileInput = document.getElementById('pdfFile');
+
+      if (fileInput.files.length === 0) {
+        loadingDiv.style.display = 'none';
+        responseDiv.textContent = 'Por favor, selecione um arquivo PDF.';
+        return;
+      }
+
+      formData.append('pdf', fileInput.files[0]);
+
+      try {
+        const res = await fetch('http://localhost:3000/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!res.ok) {
+          throw new Error('Falha na requisição: ' + res.statusText);
+        }
+
+        const data = await res.json();
+
+        if (data.resultado) {
+          responseDiv.textContent = data.resultado;
+        } else if (data.error) {
+          responseDiv.textContent = 'Erro na resposta da OpenAI: ' + data.error;
+        } else {
+          responseDiv.textContent = 'Resposta inesperada da API.';
+        }
+
+      } catch (error) {
+        console.error('Erro:', error);
+        responseDiv.textContent = 'Erro ao processar o PDF: ' + error.message;
+      } finally {
+        loadingDiv.style.display = 'none'; // Sempre esconder o "analisando..."
+      }
+    });
+  </script>
+</body>
+</html>
