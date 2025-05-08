@@ -36,7 +36,7 @@ app.post('/upload', upload.single('pdf'), async (req, res, next) => {
     const dataBuffer = await pdfParse(req.file.buffer);
     const pdfText = dataBuffer.text;
 
-    const prompt = `Avalie de forma profissional o seguinte currículo e forneça dicas para melhorias: . Se comunique apenas em chinês\n\n${pdfText}`;
+    const prompt = `Avalie de forma profissional o seguinte currículo e forneça dicas para melhorias:\n\n${pdfText}`;
 
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
