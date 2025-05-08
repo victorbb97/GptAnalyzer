@@ -1,0 +1,105 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  background: #ffffff url('./assets/textura\ background.jpg');
+  background-size: cover;
+  background-repeat: repeat;
+  color: #333;
+  position: relative;
+  overflow-x: hidden;
+  min-height: 100vh; 
+  display: block; 
+}
+
+  
+  form {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    display: inline-block;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); 
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  input[type="file"] {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  button {
+    padding: 0.5rem 1.5rem;
+    background-color: #007BFF; 
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #0056b3; 
+  }
+  
+  #response {
+    margin-top: 2rem;
+    white-space: pre-wrap;
+    text-align: left;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); 
+  }
+  
+  #loading {
+    margin-top: 2rem;
+    font-style: italic;
+    color: #555;
+  }
+
+  #loading-bar-container {
+    width: 100%;
+    max-width: 400px;
+    height: 10px;
+    background-color: #e0e0e0; 
+    border-radius: 5px;
+    margin: 1rem auto;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  #loading-bar {
+    width: 0%;
+    height: 100%;
+    background-color: #007BFF; 
+    transition: width 0.3s ease;
+  }
+
+  #main-title {
+    font-size: 13rem; 
+    font-weight: bold;
+    color: transparent; 
+    -webkit-text-stroke: 3px #0056b3;
+    text-align: center;
+    margin-top: 200px;
+    margin-bottom: 5rem; 
+  }
+
+  #content {
+    #content {
+      margin: 0 auto; /* Centraliza horizontalmente */
+      margin-top: 445rem; /* Adiciona espaço no topo */
+      padding-bottom: 1rem; /* Adiciona espaço no final */
+      max-width: 800px; /* Define uma largura máxima */
+    } 
+  }

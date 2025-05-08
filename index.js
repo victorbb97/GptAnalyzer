@@ -5,7 +5,7 @@ import { OpenAI } from 'openai';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import pdfParse from 'pdf-parse'; // Corrigido aqui
+import pdfParse from 'pdf-parse';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,6 +17,9 @@ const port = 3000;
 app.use(cors({
   origin: '*',
 }));
+
+// Servir arquivos estáticos
+app.use(express.static(path.join(__dirname)));
 
 // Servir o index.html corretamente
 app.get('/', (req, res) => {
@@ -33,7 +36,7 @@ app.post('/upload', upload.single('pdf'), async (req, res, next) => {
     const dataBuffer = await pdfParse(req.file.buffer);
     const pdfText = dataBuffer.text;
 
-    const prompt = `Avalie de forma profissional o seguinte currículo e forneça dicas para melhorias:\n\n${pdfText}`;
+    const prompt = `Avalie de forma profissional o seguinte currículo e forneça dicas para melhorias: . Se comunique apenas em chinês\n\n${pdfText}`;
 
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
