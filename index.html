@@ -11,86 +11,89 @@
   <div id="content">
     <h2>Envie seu Currículo em PDF</h2>
 
-  <form id="upload-form" enctype="multipart/form-data">
-    <input type="file" id="pdfFile" name="pdf" accept="application/pdf" required><br>
-    <button type="submit">Enviar para Análise</button>
-  </form>
+    <form id="upload-form" enctype="multipart/form-data">
+      <input type="file" id="pdfFile" name="pdf" accept="application/pdf" required><br><br>
+      <input type="email" id="emailInput" name="email" placeholder="Digite seu e-mail" required><br><br>
+      <button type="submit">Enviar para Análise</button>
+    </form>
 
-  <div id="loading" style="display: none;">Analisando currículo, aguarde...</div>
-  <div id="response"></div>
+    <div id="loading" style="display: none;">Analisando currículo, aguarde...</div>
+    <div id="response"></div>
 
-  <div id="loading-bar-container" style="display: none;">
-    <div id="loading-bar"></div>
+    <div id="loading-bar-container" style="display: none;">
+      <div id="loading-bar"></div>
+    </div>
   </div>
 
   <script>
     const form = document.getElementById('upload-form');
-  const responseDiv = document.getElementById('response');
-  const loadingDiv = document.getElementById('loading');
-  const loadingBarContainer = document.getElementById('loading-bar-container');
-  const loadingBar = document.getElementById('loading-bar');
+    const responseDiv = document.getElementById('response');
+    const loadingDiv = document.getElementById('loading');
+    const loadingBarContainer = document.getElementById('loading-bar-container');
+    const loadingBar = document.getElementById('loading-bar');
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-    responseDiv.textContent = ''; // Limpar resposta anterior
-    loadingDiv.style.display = 'block'; // Mostrar "analisando..."
-    loadingBarContainer.style.display = 'block'; // Mostrar barra de loading
-    loadingBar.style.width = '0%'; // Resetar barra de progresso
+      responseDiv.textContent = '';
+      loadingDiv.style.display = 'block';
+      loadingBarContainer.style.display = 'block';
+      loadingBar.style.width = '0%';
 
-    const formData = new FormData();
-    const fileInput = document.getElementById('pdfFile');
+      const fileInput = document.getElementById('pdfFile');
+      const emailInput = document.getElementById('emailInput');
 
-    if (fileInput.files.length === 0) {
-      loadingDiv.style.display = 'none';
-      loadingBarContainer.style.display = 'none';
-      responseDiv.textContent = 'Por favor, selecione um arquivo PDF.';
-      return;
-    }
-
-    formData.append('pdf', fileInput.files[0]);
-
-    // Simular progresso da barra de loading
-    let progress = 0;
-    const interval = setInterval(() => {
-      if (progress < 90) {
-        progress += 10;
-        loadingBar.style.width = progress + '%';
-      }
-    }, 300);
-
-    try {
-      const res = await fetch('http://localhost:3000/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!res.ok) {
-        throw new Error('Falha na requisição: ' + res.statusText);
+      if (fileInput.files.length === 0 || !emailInput.value) {
+        loadingDiv.style.display = 'none';
+        loadingBarContainer.style.display = 'none';
+        responseDiv.textContent = 'Por favor, selecione um PDF e digite seu email.';
+        return;
       }
 
-      const data = await res.json();
+      const formData = new FormData();
+      formData.append('pdf', fileInput.files[0]);
+      formData.append('email', emailInput.value);
 
-      if (data.resultado) {
-        responseDiv.textContent = data.resultado;
-      } else if (data.error) {
-        responseDiv.textContent = 'Erro na resposta da OpenAI: ' + data.error;
-      } else {
-        responseDiv.textContent = 'Resposta inesperada da API.';
+      let progress = 0;
+      const interval = setInterval(() => {
+        if (progress < 90) {
+          progress += 10;
+          loadingBar.style.width = progress + '%';
+        }
+      }, 300);
+
+      try {
+        const res = await fetch('http://localhost:3000/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!res.ok) {
+          throw new Error('Falha na requisição: ' + res.statusText);
+        }
+
+        const data = await res.json();
+
+        if (data.resultado) {
+          responseDiv.textContent = data.resultado;
+        } else if (data.error) {
+          responseDiv.textContent = 'Erro: ' + data.error;
+        } else {
+          responseDiv.textContent = 'Resposta inesperada.';
+        }
+
+      } catch (error) {
+        console.error('Erro:', error);
+        responseDiv.textContent = 'Erro ao processar: ' + error.message;
+      } finally {
+        clearInterval(interval);
+        loadingBar.style.width = '100%';
+        setTimeout(() => {
+          loadingDiv.style.display = 'none';
+          loadingBarContainer.style.display = 'none';
+        }, 500);
       }
-
-    } catch (error) {
-      console.error('Erro:', error);
-      responseDiv.textContent = 'Erro ao processar o PDF: ' + error.message;
-    } finally {
-      clearInterval(interval); // Parar o progresso simulado
-      loadingBar.style.width = '100%'; // Completar a barra de progresso
-      setTimeout(() => {
-        loadingDiv.style.display = 'none'; // Esconder "analisando..."
-        loadingBarContainer.style.display = 'none'; // Esconder barra de loading
-      }, 500); // Pequeno atraso para mostrar a barra completa
-    }
-  });
+    });
   </script>
 </body>
 </html>
