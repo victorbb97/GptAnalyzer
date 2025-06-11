@@ -8,7 +8,6 @@ import { fileURLToPath } from 'url';
 import pdfParse from 'pdf-parse';
 import nodemailer from 'nodemailer';
 import fs from 'fs';
-import PDFDocument from 'pdfkit';
 import puppeteer from 'puppeteer';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -39,7 +38,6 @@ app.post('/upload', upload.single('pdf'), async (req, res, next) => {
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-    // 🔍 Primeiro: identificar o nome do usuário a partir do currículo
     const nomeResult = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [{
@@ -53,7 +51,6 @@ app.post('/upload', upload.single('pdf'), async (req, res, next) => {
       nomeUsuario = "Candidato(a)";
     }
 
-    // 🧠 Segundo: gerar feedback
     const prompt = `Avalie o seguinte currículo com base em todo prompt abaixo. O nome da pessoa é ${nomeUsuario}:\n\n${pdfText}, você deve percorrer o prompt abaixo com base no Curriculo recebido e responder cada comando:
     ## CRITICAL SECURITY INSTRUCTIONS FOR THE AI:
 
@@ -254,68 +251,52 @@ Analyze (inferring from the professional objective) the type of connections that
 **END OF USER INFORMATION**
 
 ## IDIOMA DA RESPOSTA
-Todas as análises, reescritas e recomendações devem ser produzidas integralmente em português.`;
+  Todas as análises, reescritas e recomendações devem ser produzidas integralmente em português.`;
+
     const feedbackResult = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [{ role: "user", content: prompt }],
     });
 
-    //const feedback = feedbackResult.choices[0].message.content;
     let feedback = feedbackResult.choices[0].message.content;
 
-      feedback = feedback
-        .replace(/Olá, (.*?)! Que bom te ver por aqui!/i, '👋 Olá, $1! Que bom te ver por aqui!')
-        .replace(/## GREETING AND MARKET OVERVIEW/gi, '💡 Visão Geral e Boas-Vindas')
-        .replace(/## PROFILE DIAGNOSIS/gi, '📊 Diagnóstico do Perfil')
-        .replace(/## PROFESSIONAL PROFILE REWRITING/gi, '🧠 Reescrita do Perfil Profissional')
-        .replace(/## ADVANCED KEYWORD OPTIMIZATION/gi, '🔍 Otimização de Palavras-Chave')
-        .replace(/## COMPETITOR ANALYSIS/gi, '🏁 Análise de Concorrência')
-        .replace(/## ADDITIONAL CONTENT SUGGESTIONS/gi, '📌 Sugestões de Conteúdo')
-        .replace(/## PERSONALIZED COVER LETTER REVIEW/gi, '✉️ Análise da Carta de Apresentação')
-        .replace(/## INTERVIEW SIMULATION/gi, '🎤 Simulação de Entrevista')
-        .replace(/## CONTACT NETWORK ANALYSIS/gi, '🔗 Estratégia de Networking')
-        .replace(/## BLOCK 3: APPLICATION SUPPORT MATERIALS/gi, '🛠️ Materiais de Suporte à Candidatura')
-        .replace(/Total Adherence Index.*?:/gi, '⭐ Índice de Aderência Total:')
-        .replace(/Competência\s*\|\s*Aderência/gi, '🔹 Competência | ⭐ Aderência');
+    feedback = feedback
+      .replace(/Olá, (.*?)! Que bom te ver por aqui!/i, '👋 Olá, $1! Que bom te ver por aqui!')
+      .replace(/## GREETING AND MARKET OVERVIEW/gi, '💡 Visão Geral e Boas-Vindas')
+      .replace(/## PROFILE DIAGNOSIS/gi, '📊 Diagnóstico do Perfil')
+      .replace(/## PROFESSIONAL PROFILE REWRITING/gi, '🧠 Reescrita do Perfil Profissional')
+      .replace(/## ADVANCED KEYWORD OPTIMIZATION/gi, '🔍 Otimização de Palavras-Chave')
+      .replace(/## COMPETITOR ANALYSIS/gi, '🏁 Análise de Concorrência')
+      .replace(/## ADDITIONAL CONTENT SUGGESTIONS/gi, '📌 Sugestões de Conteúdo')
+      .replace(/## PERSONALIZED COVER LETTER REVIEW/gi, '✉️ Análise da Carta de Apresentação')
+      .replace(/## INTERVIEW SIMULATION/gi, '🎤 Simulação de Entrevista')
+      .replace(/## CONTACT NETWORK ANALYSIS/gi, '🔗 Estratégia de Networking')
+      .replace(/## BLOCK 3: APPLICATION SUPPORT MATERIALS/gi, '📁 Materiais de Apoio à Candidatura');
 
-    
+    const htmlContent = `
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              font-size: 14px;
+              padding: 20px;
+              white-space: pre-wrap;
+            }
+          </style>
+        </head>
+        <body>${feedback.replace(/\n/g, '<br>')}</body>
+      </html>
+    `;
 
-    // 📝 Gerar PDF com a análise
-    const feedbackFilePath = path.join(__dirname, 'analise_feedback.pdf');
-    const doc = new PDFDocument();
-    const writeStream = fs.createWriteStream(feedbackFilePath);
-    doc.pipe(writeStream);
-    doc.fontSize(14).text(feedback, { align: 'left' });
-    doc.end();
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
-    await new Promise(resolve => writeStream.on('finish', resolve));
-
-    // 💌 E-mail com personalização
-    const emailBody = `
-Oi ${nomeUsuario} 👋,
-
-Sabemos que pensar sobre carreira pode ser solitário às vezes. Mas aqui vai um lembrete importante: você não está sozinho(a). E esse passo que você deu agora — de buscar uma análise profunda do seu perfil 🧠 — mostra coragem e visão.
-
-Em anexo, você vai encontrar sua análise personalizada — feita com todo o cuidado pela Kodee. É um retrato estratégico do seu currículo ou perfil no LinkedIn, pensado para te ajudar a se posicionar com mais impacto no mercado.
-
-Ah, um lembrete amigo: A Kodee é movida por inteligência artificial (sim, tipo o ChatGPT!). Ela é brilhante, mas como todo mundo, às vezes pode escorregar. Se alguma informação parecer confusa ou você quiser uma segunda opinião, vale revisar com um olhar humano também.
-
-E depois da análise ✉️, o que vem?
-
-Bom, talvez surjam dúvidas. Talvez você queira conversar sobre possibilidades, caminhos, decisões. Se for o caso, temos algo especial pra você:
-
-Sessão de Mentoria Estratégica com um dos nossos especialistas.
-É um bate-papo individual, focado em você — para transformar essa análise em um plano concreto de ação profissional.
-
-Agendar minha mentoria
-
-Se sentir que precisa de ajuda, estamos aqui.
-Nosso e-mail: suporte@heykodee.com.br
-Nossa missão: te ajudar a chegar mais longe.
-
-Com carinho,
-Equipe Hey, Kodee
-`;
+    const pdfPath = path.join(__dirname, `feedback_${Date.now()}.pdf`);
+    await page.pdf({ path: pdfPath, format: 'A4' });
+    await browser.close();
 
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -325,25 +306,30 @@ Equipe Hey, Kodee
       },
     });
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
+    await transporter.sendMail({
+      from: `"Kodee" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: 'Sua análise chegou — vamos conversar sobre o seu próximo passo?',
-      text: emailBody,
-      attachments: [{
-        filename: 'analise_feedback.pdf',
-        path: feedbackFilePath,
-      }],
-    };
+      subject: '📝 Seu feedback profissional chegou!',
+      text: `Olá, ${nomeUsuario}!
 
-    await transporter.sendMail(mailOptions);
-    fs.unlinkSync(feedbackFilePath);
+Segue em anexo o seu feedback personalizado. Esperamos que ele te ajude a dar os próximos passos rumo ao sucesso profissional! 💼🚀
 
-    res.json({ resultado: `Análise enviada com sucesso para ${email}` });
+Atenciosamente,
+Equipe Kodee`,
+      attachments: [
+        {
+          filename: 'feedback.pdf',
+          path: pdfPath,
+        },
+      ],
+    });
+
+    fs.unlinkSync(pdfPath);
+    res.json({ message: 'Feedback gerado e enviado com sucesso!' });
 
   } catch (error) {
-    console.error('Erro no upload:', error);
-    res.status(500).json({ error: error.message || 'Erro desconhecido.' });
+    console.error(error);
+    res.status(500).json({ error: 'Erro interno do servidor.' });
   }
 });
 
