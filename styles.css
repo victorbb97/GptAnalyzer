@@ -3,7 +3,7 @@ body {
   padding: 0;
   margin: 0;
   text-align: center;
-  background: #ffffff url('./assets/textura\ background.jpg');
+  background: #ffffff;
   background-size: cover;
   background-repeat: repeat;
   color: #333;
@@ -12,42 +12,65 @@ body {
   min-height: 100vh; 
   display: block; 
 }
-
-  
   form {
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    display: inline-block;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); 
-    max-width: 400px;
-    margin: 0 auto;
-  }
-  
-  input[type="file"] {
-    margin-bottom: 1rem;
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 100%;
-    box-sizing: border-box;
-  }
-  
-  button {
-    padding: 0.5rem 1.5rem;
-    background-color: #007BFF; 
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  button:hover {
-    background-color: #0056b3; 
-  }
-  
+  background: #fff;
+  padding: 2.5rem 2rem;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 8px 32px rgba(0, 123, 255, 0.10), 0 2px 8px rgba(0,0,0,0.08);
+  max-width: 420px;
+  margin: 2rem auto 0 auto;
+  gap: 1.2rem;
+  border: 1.5px solid #e3eafc;
+}
+
+input[type="file"], input[type="email"] {
+  padding: 0.7rem 1rem;
+  border: 1.5px solid #b6d0fa;
+  border-radius: 8px;
+  width: 100%;
+  font-size: 1rem;
+  background: #f7fbff;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+input[type="file"]:focus, input[type="email"]:focus {
+  border-color: #7E04D1;
+  outline: none;
+}
+
+input[type="email"]::placeholder {
+  color: #a0b8d9;
+  opacity: 1;
+}
+
+button {
+  padding: 0.7rem 2.2rem;
+  background: linear-gradient(90deg, #7E04D1 60%, #C976FF 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,123,255,0.10);
+  transition: background 0.3s, transform 0.2s;
+  margin-top: 0.5rem;
+}
+
+button:hover {
+  background: linear-gradient(90deg, #7E04D1 60%, #C976FF 100%);
+  transform: translateY(-2px) scale(1.03);
+}
+
+/* Remove <br> extras do formulário */
+form br {
+  display: none;
+}
+ 
   #response {
     margin-top: 2rem;
     white-space: pre-wrap;
@@ -58,7 +81,7 @@ body {
     background: white;
     padding: 1rem;
     border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); 
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(126, 4, 209, 0.18);
   }
   
   #loading {
@@ -75,13 +98,13 @@ body {
     border-radius: 5px;
     margin: 1rem auto;
     overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 16px rgba(126, 4, 209, 0.18), 0 2px 8px rgba(0, 0, 0, 0.28);
   }
   
   #loading-bar {
     width: 0%;
     height: 100%;
-    background-color: #007BFF; 
+    background-color: #7E04D1; 
     transition: width 0.3s ease;
   }
 
@@ -89,7 +112,7 @@ body {
     font-size: 13rem; 
     font-weight: bold;
     color: transparent; 
-    -webkit-text-stroke: 3px #0056b3;
+    -webkit-text-stroke: 3px #7E04D1;
     text-align: center;
     margin-top: 200px;
     margin-bottom: 5rem; 
@@ -103,3 +126,5 @@ body {
       max-width: 800px; /* Define uma largura máxima */
     } 
   }
+
+  
