@@ -217,108 +217,135 @@ Rephrase all sections listed, following reverse chronological order. Provide the
 
     // CONVERSÃO DE MARKDOWN PARA HTML AQUI:
     const htmlContentFromMarkdown = marked(feedback); // Converte o feedback (agora em Markdown) para HTML
+    const imageBuffer = fs.readFileSync(path.join(__dirname, 'assets', 'HeyKodee.png'));
+    const imageBase64 = imageBuffer.toString('base64');
 
+    
     const htmlContent = `
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <style>
-            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Noto+Color+Emoji&display=swap');
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Noto+Color+Emoji&display=swap');
 
-            body {
-              font-family: 'Roboto', 'Noto Color Emoji', Arial, sans-serif; /* Priorize Roboto, com fallback para Noto Color Emoji e Arial */
-              font-size: 14px;
-              line-height: 1.6; /* Melhora a legibilidade */
-              padding: 30px; /* Mais padding para um visual mais limpo */
-              color: #333; /* Cor de texto mais suave */
-              background-color: #fff; /* Fundo branco para o PDF */
-            }
+    body {
+      font-family: 'Roboto', 'Noto Color Emoji', Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      padding: 30px;
+      color: #333;
+      background-color: #fff;
+    }
 
-            /* Estilos para títulos */
-            h1, h2, h3, h4, h5, h6 {
-                margin-top: 1.5em; /* Aumenta o espaço acima dos títulos */
-                margin-bottom: 0.8em;
-                font-weight: 700; /* Garante negrito mais evidente */
-                color: #2c3e50; /* Cor para os títulos */
-                page-break-after: avoid; /* Evita quebras de página imediatamente após o título */
-            }
-            h1 { font-size: 2.2em; border-bottom: 2px solid #eee; padding-bottom: 0.3em; }
-            h2 { font-size: 1.8em; }
-            h3 { font-size: 1.4em; }
-            h4 { font-size: 1.2em; }
-            h5 { font-size: 1em; }
-            h6 { font-size: 0.9em; }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 2em;
+      margin-bottom: 1em;
+      font-weight: 700;
+      color: #2c3e50;
+      page-break-after: avoid;
+    }
 
-            /* Estilos para parágrafos */
-            p {
-                margin-bottom: 1em;
-                text-align: justify; /* Justifica o texto para um visual mais profissional */
-            }
+    h1 { font-size: 2.2em; border-bottom: 2px solid #eee; padding-bottom: 0.3em; text-align: center; }
+    h2 { font-size: 1.8em; }
+    h3 { font-size: 1.4em; }
+    h4 { font-size: 1.2em; }
+    h5 { font-size: 1em; }
+    h6 { font-size: 0.9em; }
 
-            /* Estilos para listas (ul e ol) */
-            ul, ol {
-                margin-left: 25px; /* Ajusta o recuo da lista */
-                margin-bottom: 1em;
-                padding: 0;
-            }
-            ul li, ol li {
-                margin-bottom: 0.5em;
-            }
+    p {
+      margin-bottom: 1em;
+      text-align: justify;
+    }
 
-            /* Estilos para negrito e itálico */
-            strong { font-weight: bold; } /* Garante negrito */
-            em { font-style: italic; } /* Garante itálico */
+    ul, ol {
+      margin-left: 25px;
+      margin-bottom: 1em;
+      padding: 0;
+    }
 
-            /* Estilos para tabelas */
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 1.5em; /* Mais espaço após a tabela */
-                box-shadow: 0 0 5px rgba(0,0,0,0.1); /* Sutil sombra para destacar */
-            }
-            th, td {
-                border: 1px solid #ddd;
-                padding: 10px 12px; /* Aumenta o padding */
-                text-align: left;
-            }
-            th {
-                background-color: #f8f8f8; /* Cor de fundo para cabeçalho da tabela */
-                font-weight: bold;
-                color: #555;
-            }
-            tr:nth-child(even) {
-                background-color: #f9f9f9; /* Zebra striping para linhas da tabela */
-            }
+    ul li, ol li {
+      margin-bottom: 0.5em;
+    }
 
-            /* Estilos específicos para emojis */
-            /* Noto Color Emoji é uma fonte de emoji da Google, crucial para exibição consistente */
-            /* A ordem das fontes é importante: primeiro a fonte de texto, depois a de emoji */
-            /* Se houver algum problema com emojis grandes ou desalinhados, podemos ajustar aqui */
-            
-            /* Melhoria na exibição de emojis se o ChatGPT os enviar diretamente como texto simples */
-            /* Os emojis dentro dos replaces que você já tem devem aparecer bem com a fonte Noto Color Emoji */
+    strong { font-weight: bold; }
+    em { font-style: italic; }
 
-            /* Outros ajustes gerais para melhor legibilidade no PDF */
-            a {
-                color: #007bff;
-                text-decoration: none;
-            }
-            a:hover {
-                text-decoration: underline;
-            }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5em;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
 
-            /* Quebras de página para melhor organização */
-            section {
-                page-break-inside: avoid; /* Evita quebrar uma seção no meio */
-            }
-            .page-break {
-                page-break-before: always; /* Força uma nova página */
-            }
-          </style>
-        </head>
-        <body>${htmlContentFromMarkdown}</body>
-      </html>
-    `;
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f8f8f8;
+      font-weight: bold;
+      color: #555;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    section {
+      page-break-inside: avoid;
+      margin-top: 40px;
+      margin-bottom: 40px;
+    }
+
+    
+    .centered-title {
+      text-align: center;
+      font-weight: bold;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- CAPA -->
+  <!-- CAPA -->
+  <div class="centered-title" style="margin-top: 150px;">
+  <img src="data:image/png;base64,${imageBase64}" alt="HeyKodee Logo" style="width: 300px; margin: 20px auto; display: block;" />
+  <h1>Feedback Profissional</h1>
+  <p style="text-align: center;"><strong>${nomeUsuario}</strong></p>
+  <p style="text-align: center;">${new Date().toLocaleDateString('pt-BR')}</p>
+</div>
+
+
+  
+
+  <!-- Conteúdo Gerado - Estruturado em Seções -->
+  <section>
+    ${htmlContentFromMarkdown
+      .replace(/(^|\n)#{1} (.*)/g, '<h1>$2</h1>')
+      .replace(/(^|\n)#{2} (.*)/g, '<h2>$2</h2>')
+      .replace(/(^|\n)#{3} (.*)/g, '<h3>$2</h3>')
+      .replace(/\n\n+/g, '</p><p>') // Abre e fecha parágrafos
+      .replace(/^/g, '<p>')          // Começo
+      .replace(/$/g, '</p>')         // Fim
+    }
+  </section>
+
+</body>
+</html>
+`;
+
 
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
