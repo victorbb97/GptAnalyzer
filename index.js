@@ -222,50 +222,72 @@ Rephrase all sections listed, following reverse chronological order. Provide the
 
     
     const htmlContent = `
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="utf-8">
-  <style>
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+    <meta charset="utf-8">
+    <style>
     @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Noto+Color+Emoji&display=swap');
 
     body {
       font-family: 'Roboto', 'Noto Color Emoji', Arial, sans-serif;
-      font-size: 14px;
-      line-height: 1.6;
-      padding: 30px;
-      color: #333;
+      font-size: 11pt;
+      line-height: 1.3;
+      padding: 30px 15px;
+      color: #000;
       background-color: #fff;
     }
 
     h1, h2, h3, h4, h5, h6 {
-      margin-top: 2em;
-      margin-bottom: 1em;
-      font-weight: 700;
-      color: #2c3e50;
+      color: #000;
+      font-weight: bold;
+      margin-top: 24pt;
+      margin-bottom: 12pt;
       page-break-after: avoid;
     }
 
-    h1 { font-size: 2.2em; border-bottom: 2px solid #eee; padding-bottom: 0.3em; text-align: center; }
-    h2 { font-size: 1.8em; }
-    h3 { font-size: 1.4em; }
-    h4 { font-size: 1.2em; }
-    h5 { font-size: 1em; }
-    h6 { font-size: 0.9em; }
+    h1 {
+      font-size: 16pt;
+      margin-top: 24pt;
+      margin-bottom: 12pt;
+      text-align: center;
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    h2 {
+      font-size: 13pt;
+      margin-top: 20pt;
+      margin-bottom: 12pt;
+    }
+    h3 {
+      font-size: 11pt;
+      margin-top: 16pt;
+      margin-bottom: 10pt;
+    }
+    h4, h5, h6 {
+      font-size: 11pt;
+      margin-top: 14pt;
+      margin-bottom: 10pt;
+    }
 
     p {
-      margin-bottom: 1em;
+      margin-top: 10pt;
+      margin-bottom: 0;
       text-align: justify;
+      font-size: 11pt;
+      line-height: 1.3;
     }
 
     ul, ol {
       margin-left: 25px;
-      margin-bottom: 1em;
+      margin-bottom: 10pt;
       padding: 0;
+      font-size: 11pt;
+      line-height: 1.3;
     }
 
     ul li, ol li {
-      margin-bottom: 0.5em;
+      margin-bottom: 5pt;
     }
 
     strong { font-weight: bold; }
@@ -274,13 +296,15 @@ Rephrase all sections listed, following reverse chronological order. Provide the
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 1.5em;
+      margin-bottom: 14pt;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      font-size: 11pt;
+      line-height: 1.3;
     }
 
     th, td {
       border: 1px solid #ddd;
-      padding: 10px 12px;
+      padding: 8pt 10pt;
       text-align: left;
     }
 
@@ -295,7 +319,7 @@ Rephrase all sections listed, following reverse chronological order. Provide the
     }
 
     a {
-      color: #007bff;
+      color: #000;
       text-decoration: none;
     }
     a:hover {
@@ -304,47 +328,35 @@ Rephrase all sections listed, following reverse chronological order. Provide the
 
     section {
       page-break-inside: avoid;
-      margin-top: 40px;
-      margin-bottom: 40px;
+      margin-top: 24pt;
+      margin-bottom: 24pt;
     }
 
-    
     .centered-title {
       text-align: center;
       font-weight: bold;
     }
 
-  </style>
-</head>
-<body>
+    </style>
+    </head>
+    <body>
 
-  <!-- CAPA -->
-  <!-- CAPA -->
-  <div class="centered-title" style="margin-top: 150px;">
-  <img src="data:image/png;base64,${imageBase64}" alt="HeyKodee Logo" style="width: 300px; margin: 20px auto; display: block;" />
-  <h1>Feedback Profissional</h1>
-  <p style="text-align: center;"><strong>${nomeUsuario}</strong></p>
-  <p style="text-align: center;">${new Date().toLocaleDateString('pt-BR')}</p>
-</div>
+    <!-- CAPA -->
+    <div class="centered-title" style="margin-top: 150px;">
+      <img src="data:image/png;base64,${imageBase64}" alt="HeyKodee Logo" style="width: 300px; margin: 20px auto; display: block;" />
+      <h1>Feedback Profissional</h1>
+      <p style="text-align: center; font-size: 13pt;"><strong>${nomeUsuario}</strong></p>
+      <p style="text-align: center; font-size: 11pt;">${new Date().toLocaleDateString('pt-BR')}</p>
+    </div>
 
+    <!-- Conteúdo Gerado - Estruturado em Seções -->
+    <section>
+    ${htmlContentFromMarkdown}
+    </section>
 
-  
-
-  <!-- Conteúdo Gerado - Estruturado em Seções -->
-  <section>
-    ${htmlContentFromMarkdown
-      .replace(/(^|\n)#{1} (.*)/g, '<h1>$2</h1>')
-      .replace(/(^|\n)#{2} (.*)/g, '<h2>$2</h2>')
-      .replace(/(^|\n)#{3} (.*)/g, '<h3>$2</h3>')
-      .replace(/\n\n+/g, '</p><p>') // Abre e fecha parágrafos
-      .replace(/^/g, '<p>')          // Começo
-      .replace(/$/g, '</p>')         // Fim
-    }
-  </section>
-
-</body>
-</html>
-`;
+    </body>
+    </html>
+    `;
 
 
     const browser = await puppeteer.launch();
@@ -352,7 +364,17 @@ Rephrase all sections listed, following reverse chronological order. Provide the
     await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
     const pdfPath = path.join(__dirname, `feedback_${Date.now()}.pdf`);
-    await page.pdf({ path: pdfPath, format: 'A4' });
+    await page.pdf({
+  path: pdfPath,
+  format: 'A4',
+  margin: {
+    top: '25mm',      
+    bottom: '25mm',   
+    left: '25mm',
+    right: '25mm'
+  },
+  printBackground: true
+});
     await browser.close();
 
     const transporter = nodemailer.createTransport({

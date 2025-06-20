@@ -17,6 +17,6 @@
     "openai": "^4.20.0",
     "pdf-parse": "^1.1.1",
     "pdfkit": "^0.17.1",
-    "puppeteer": "^24.10.0"
+    "puppeteer": "^24.10.1"
   }
 }
