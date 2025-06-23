@@ -10,7 +10,17 @@ import nodemailer from 'nodemailer';
 import fs from 'fs';
 import puppeteer from 'puppeteer';
 import { marked } from 'marked';
+import mongoose from 'mongoose';
 
+
+//instancia MongoDB
+   mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('MongoDB conectado!'))
+  .catch(err => console.error('Erro ao conectar MongoDB:', err));
+
+
+
+//index
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -27,7 +37,11 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.post('/upload', upload.single('pdf'), async (req, res, next) => {
+
+//rota /upload para proteger com o middleware
+
+// app.post('/upload', upload.single('pdf'), async (req, res, next) =>
+   app.post('/upload', validateAccessToken, upload.single('pdf'), async (req, res, next) => {
   try {
     const email = req.body.email;
     if (!req.file || !email) {
@@ -430,3 +444,19 @@ Com carinho, Equipe Hey, Kodee`,
 app.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:${port}`);
 });
+
+//Middleware de validação de token,
+import AccessToken from './models/AccessToken.js';
+
+async function validateAccessToken(req, res, next) {
+  const token = req.headers['x-access-token'] || req.body.token;
+
+  if (!token) return res.status(401).json({ error: 'Token de acesso não informado.' });
+
+  const foundToken = await AccessToken.findOne({ token });
+
+  if (!foundToken) return res.status(403).json({ error: 'Token inválido.' });
+
+  next();
+}
+

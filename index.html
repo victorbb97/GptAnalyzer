@@ -75,62 +75,74 @@
 
         // Enviar arquivo e email ao clicar na seta
         sendBtn.addEventListener('click', async () => {
-            responseDiv.textContent = '';
-            loadingDiv.style.display = 'block';
-            loadingBarContainer.style.display = 'block';
-            loadingBar.style.width = '0%';
+        responseDiv.textContent = '';
+        loadingDiv.style.display = 'block';
+        loadingBarContainer.style.display = 'block';
+        loadingBar.style.width = '0%';
 
-            if (pdfInput.files.length === 0 || !emailInput.value.trim()) {
+        if (pdfInput.files.length === 0 || !emailInput.value.trim()) {
+            loadingDiv.style.display = 'none';
+            loadingBarContainer.style.display = 'none';
+            responseDiv.textContent = 'Por favor, selecione um PDF e digite seu email.';
+            return;
+        }
+
+        const token = document.querySelector('.key-input').value.trim();
+        if (!token) {
+            loadingDiv.style.display = 'none';
+            loadingBarContainer.style.display = 'none';
+            responseDiv.textContent = 'Por favor, insira sua chave de acesso.';
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('pdf', pdfInput.files[0]);
+        formData.append('email', emailInput.value.trim());
+
+        let progress = 0;
+        const interval = setInterval(() => {
+            if (progress < 90) {
+                progress += 10;
+                loadingBar.style.width = progress + '%';
+            }
+        }, 300);
+
+        try {
+            const res = await fetch('http://localhost:3000/upload', {
+                method: 'POST',
+                headers: {
+                    'x-access-token': token
+                },
+                body: formData,
+            });
+
+            if (!res.ok) {
+                throw new Error('Falha na requisição: ' + res.statusText);
+            }
+
+            const data = await res.json();
+
+            if (data.resultado) {
+                responseDiv.textContent = data.resultado;
+            } else if (data.error) {
+                responseDiv.textContent = 'Erro: ' + data.error;
+            } else {
+                responseDiv.textContent = 'E-mail enviado com sucesso.';
+            }
+
+        } catch (error) {
+            console.error('Erro:', error);
+            responseDiv.textContent = 'Erro ao processar: ' + error.message;
+        } finally {
+            clearInterval(interval);
+            loadingBar.style.width = '100%';
+            setTimeout(() => {
                 loadingDiv.style.display = 'none';
                 loadingBarContainer.style.display = 'none';
-                responseDiv.textContent = 'Por favor, selecione um PDF e digite seu email.';
-                return;
-            }
+            }, 500);
+        }
+    });
 
-            const formData = new FormData();
-            formData.append('pdf', pdfInput.files[0]);
-            formData.append('email', emailInput.value.trim());
-
-            let progress = 0;
-            const interval = setInterval(() => {
-                if (progress < 90) {
-                    progress += 10;
-                    loadingBar.style.width = progress + '%';
-                }
-            }, 300);
-
-            try {
-                const res = await fetch('http://localhost:3000/upload', {
-                    method: 'POST',
-                    body: formData,
-                });
-
-                if (!res.ok) {
-                    throw new Error('Falha na requisição: ' + res.statusText);
-                }
-
-                const data = await res.json();
-
-                if (data.resultado) {
-                    responseDiv.textContent = data.resultado;
-                } else if (data.error) {
-                    responseDiv.textContent = 'Erro: ' + data.error;
-                } else {
-                    responseDiv.textContent = 'E-mail enviado com sucesso.';
-                }
-
-            } catch (error) {
-                console.error('Erro:', error);
-                responseDiv.textContent = 'Erro ao processar: ' + error.message;
-            } finally {
-                clearInterval(interval);
-                loadingBar.style.width = '100%';
-                setTimeout(() => {
-                    loadingDiv.style.display = 'none';
-                    loadingBarContainer.style.display = 'none';
-                }, 500);
-            }
-        });
     </script>
 </body>
 </html>
