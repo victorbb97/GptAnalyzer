@@ -47,7 +47,8 @@ app.get('/', (req, res) => {
     if (!req.file || !email) {
       return res.status(400).json({ error: 'Arquivo PDF e email são obrigatórios.' });
     }
-
+    
+    const descricao = req.body.descricao;
     const dataBuffer = await pdfParse(req.file.buffer);
     const pdfText = dataBuffer.text;
 

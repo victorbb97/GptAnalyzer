@@ -15,43 +15,47 @@
 <body>
     <h1 class="gradient-title">Kodee LinkedIn</h1>
     <div class="center-container">
-        <div style="display: flex; flex-direction: column; align-items: flex-start; width: 700px;">
-            <h2 class="hello-title">Olá!</h2>
-            <p class="subtitle">Seja bem-vindo ao seu assistente exclusivo na busca pelo sucesso profissional!</p>
-            <div class="key-box" style="width: 500px; margin-bottom: 28px;">
-                <input class="key-input" type="text" maxlength="6" placeholder="Chave de uso" />
-                <button class="validate-btn">validar chave de uso</button>
+    <div class="content-inner">
+        <h2 class="hello-title">Olá!</h2>
+        <p class="subtitle">Seja bem-vindo ao seu assistente exclusivo na busca pelo sucesso profissional!</p>
+        <div class="key-box">
+            <input class="key-input" type="text" maxlength="6" placeholder="Chave de uso" />
+            <button class="validate-btn">validar chave de uso</button>
+        </div>
+        <!-- Formulário oculto para upload -->
+        <form id="upload-form" enctype="multipart/form-data" style="display:none;">
+            <input type="file" id="pdfFile" name="pdf" accept="application/pdf">
+        </form>
+        <div class="message-box">
+            <label for="emailInput" class="input-label">E-mail</label>
+            <input id="emailInput" class="message-input email-input" type="email" placeholder="Digite seu e-mail" />
+            <label for="descInput" class="input-label">Objetivo e breve descrição</label>
+            <textarea id="descInput" class="message-input" placeholder="Digite seu objetivo e uma breve descrição" style="height: 70px; resize: vertical;"></textarea>
+            <div class="message-actions">
+                <button id="clip-btn" class="icon-btn" title="Anexar arquivo" type="button">
+                    <!-- SVG do clipe -->
+                    <svg viewBox="0 0 24 24">
+                        <path d="M16.5,6.5v7.79c0,2.07-1.68,3.75-3.75,3.75s-3.75-1.68-3.75-3.75V6.5c0-1.24,1.01-2.25,2.25-2.25
+                        s2.25,1.01,2.25,2.25v7.25c0,0.41-0.34,0.75-0.75,0.75s-0.75-0.34-0.75-0.75V6.5h-1.5v7.79c0,1.38,1.12,2.5,2.5,2.5
+                        s2.5-1.12,2.5-2.5V6.5c0-2.07-1.68-3.75-3.75-3.75S6.5,4.43,6.5,6.5v7.79c0,2.9,2.35,5.25,5.25,5.25s5.25-2.35,5.25-5.25V6.5
+                        H16.5z"/>
+                    </svg>
+                </button>
+                <span id="file-name" style="margin-left: 10px; color: #7E04D1; font-weight: 500;"></span>
+                <button id="send-btn" class="icon-btn" title="Enviar mensagem" type="button">
+                    <!-- SVG da seta -->
+                    <svg viewBox="0 0 24 24">
+                        <path d="M2 21l21-9-21-9v7l15 2-15 2z"/>
+                    </svg>
+                </button>
             </div>
-            <!-- Formulário oculto para upload -->
-            <form id="upload-form" enctype="multipart/form-data" style="display:none;">
-                <input type="file" id="pdfFile" name="pdf" accept="application/pdf">
-            </form>
-            <div class="message-box">
-                <textarea id="emailInput" class="message-input" placeholder="Digite seu e-mail"></textarea>
-                <div class="message-actions">
-                    <!-- Botão de anexar (clip) à esquerda -->
-                    <button id="clip-btn" class="icon-btn" title="Anexar arquivo" type="button">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M16.5,6.5v7.79c0,2.07-1.68,3.75-3.75,3.75s-3.75-1.68-3.75-3.75V6.5c0-1.24,1.01-2.25,2.25-2.25
-                            s2.25,1.01,2.25,2.25v7.25c0,0.41-0.34,0.75-0.75,0.75s-0.75-0.34-0.75-0.75V6.5h-1.5v7.79c0,1.38,1.12,2.5,2.5,2.5
-                            s2.5-1.12,2.5-2.5V6.5c0-2.07-1.68-3.75-3.75-3.75S6.5,4.43,6.5,6.5v7.79c0,2.9,2.35,5.25,5.25,5.25s5.25-2.35,5.25-5.25V6.5
-                            H16.5z"/>
-                        </svg>
-                    </button>
-                    <!-- Botão de enviar (seta) à direita -->
-                    <button id="send-btn" class="icon-btn" title="Enviar mensagem" type="button">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M2 21l21-9-21-9v7l15 2-15 2z"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-            <!-- Feedback visual -->
-            <div id="loading" style="display: none; margin-top: 16px;">Analisando currículo, aguarde...</div>
-            <div id="loading-bar-container" style="display: none; width: 100%; max-width: 400px; height: 10px; background-color: #e0e0e0; border-radius: 5px; margin: 1rem 0; overflow: hidden;">
-                <div id="loading-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #7E04D1 60%, #C976FF 100%); transition: width 0.3s;"></div>
-            </div>
-            <div id="response" style="margin-top: 1rem;"></div>
+        </div>
+        <!-- Feedback visual -->
+        <div id="loading" style="display: none; margin-top: 16px;">Analisando currículo, aguarde...</div>
+        <div id="loading-bar-container" style="display: none; width: 100%; max-width: 400px; height: 10px; background-color: #e0e0e0; border-radius: 5px; margin: 1rem 0; overflow: hidden;">
+            <div id="loading-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #7E04D1 60%, #C976FF 100%); transition: width 0.3s;"></div>
+        </div>
+        <div id="response" style="margin-top: 1rem;"></div>
         </div>
     </div>
     <footer class="footer-copyright">
@@ -67,6 +71,16 @@
         const loadingDiv = document.getElementById('loading');
         const loadingBarContainer = document.getElementById('loading-bar-container');
         const loadingBar = document.getElementById('loading-bar');
+        const fileNameSpan = document.getElementById('file-name');
+        const descInput = document.getElementById('descInput');
+
+        pdfInput.addEventListener('change', () => {
+    if (pdfInput.files.length > 0) {
+        fileNameSpan.textContent = pdfInput.files[0].name;
+    } else {
+        fileNameSpan.textContent = '';
+    }
+        });
 
         // Abrir seletor de arquivo ao clicar no clipe
         clipBtn.addEventListener('click', () => {
@@ -74,6 +88,7 @@
         });
 
         // Enviar arquivo e email ao clicar na seta
+<<<<<<< Updated upstream
         sendBtn.addEventListener('click', async () => {
         responseDiv.textContent = '';
         loadingDiv.style.display = 'block';
@@ -143,6 +158,70 @@
         }
     });
 
+=======
+       sendBtn.addEventListener('click', async () => {
+    responseDiv.textContent = '';
+    loadingDiv.style.display = 'block';
+    loadingBarContainer.style.display = 'block';
+    loadingBar.style.width = '0%';
+
+    if (
+        pdfInput.files.length === 0 ||
+        !emailInput.value.trim() ||
+        !descInput.value.trim()
+    ) {
+        loadingDiv.style.display = 'none';
+        loadingBarContainer.style.display = 'none';
+        responseDiv.textContent = 'Por favor, selecione um PDF, digite seu email e objetivo/descrição.';
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('pdf', pdfInput.files[0]);
+    formData.append('email', emailInput.value.trim());
+    formData.append('descricao', descInput.value.trim());
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                if (progress < 90) {
+                    progress += 10;
+                    loadingBar.style.width = progress + '%';
+                }
+            }, 300);
+
+            try {
+                const res = await fetch('http://localhost:3000/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!res.ok) {
+                    throw new Error('Falha na requisição: ' + res.statusText);
+                }
+
+                const data = await res.json();
+
+                if (data.resultado) {
+                    responseDiv.textContent = data.resultado;
+                } else if (data.error) {
+                    responseDiv.textContent = 'Erro: ' + data.error;
+                } else {
+                    responseDiv.textContent = 'E-mail enviado com sucesso.';
+                }
+
+            } catch (error) {
+                console.error('Erro:', error);
+                responseDiv.textContent = 'Erro ao processar: ' + error.message;
+            } finally {
+                clearInterval(interval);
+                loadingBar.style.width = '100%';
+                setTimeout(() => {
+                    loadingDiv.style.display = 'none';
+                    loadingBarContainer.style.display = 'none';
+                }, 500);
+            }
+        });
+>>>>>>> Stashed changes
     </script>
 </body>
 </html>
