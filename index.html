@@ -62,34 +62,33 @@
         © 2025 Kodee LinkedIn. Todos os direitos reservados.
     </footer>
     <script>
-        // Seletores
-        const pdfInput = document.getElementById('pdfFile');
-        const emailInput = document.getElementById('emailInput');
-        const clipBtn = document.getElementById('clip-btn');
-        const sendBtn = document.getElementById('send-btn');
-        const responseDiv = document.getElementById('response');
-        const loadingDiv = document.getElementById('loading');
-        const loadingBarContainer = document.getElementById('loading-bar-container');
-        const loadingBar = document.getElementById('loading-bar');
-        const fileNameSpan = document.getElementById('file-name');
-        const descInput = document.getElementById('descInput');
+    // Seletores
+    const pdfInput = document.getElementById('pdfFile');
+    const emailInput = document.getElementById('emailInput');
+    const clipBtn = document.getElementById('clip-btn');
+    const sendBtn = document.getElementById('send-btn');
+    const responseDiv = document.getElementById('response');
+    const loadingDiv = document.getElementById('loading');
+    const loadingBarContainer = document.getElementById('loading-bar-container');
+    const loadingBar = document.getElementById('loading-bar');
+    const fileNameSpan = document.getElementById('file-name');
+    const descInput = document.getElementById('descInput');
 
-        pdfInput.addEventListener('change', () => {
-    if (pdfInput.files.length > 0) {
-        fileNameSpan.textContent = pdfInput.files[0].name;
-    } else {
-        fileNameSpan.textContent = '';
-    }
-        });
+    pdfInput.addEventListener('change', () => {
+        if (pdfInput.files.length > 0) {
+            fileNameSpan.textContent = pdfInput.files[0].name;
+        } else {
+            fileNameSpan.textContent = '';
+        }
+    });
 
-        // Abrir seletor de arquivo ao clicar no clipe
-        clipBtn.addEventListener('click', () => {
-            pdfInput.click();
-        });
+    // Abrir seletor de arquivo ao clicar no clipe
+    clipBtn.addEventListener('click', () => {
+        pdfInput.click();
+    });
 
-        // Enviar arquivo e email ao clicar na seta
-<<<<<<< Updated upstream
-        sendBtn.addEventListener('click', async () => {
+    // Enviar arquivo e email ao clicar na seta
+    sendBtn.addEventListener('click', async () => {
         responseDiv.textContent = '';
         loadingDiv.style.display = 'block';
         loadingBarContainer.style.display = 'block';
@@ -114,7 +113,7 @@
         formData.append('pdf', pdfInput.files[0]);
         formData.append('email', emailInput.value.trim());
 
-        let progress = 0;
+         let progress = 0;
         const interval = setInterval(() => {
             if (progress < 90) {
                 progress += 10;
@@ -122,7 +121,7 @@
             }
         }, 300);
 
-        try {
+             try {
             const res = await fetch('http://localhost:3000/upload', {
                 method: 'POST',
                 headers: {
@@ -137,15 +136,14 @@
 
             const data = await res.json();
 
-            if (data.resultado) {
+       if (data.resultado) {
                 responseDiv.textContent = data.resultado;
             } else if (data.error) {
                 responseDiv.textContent = 'Erro: ' + data.error;
             } else {
                 responseDiv.textContent = 'E-mail enviado com sucesso.';
-            }
-
-        } catch (error) {
+        }
+      } catch (error) {
             console.error('Erro:', error);
             responseDiv.textContent = 'Erro ao processar: ' + error.message;
         } finally {
@@ -157,71 +155,6 @@
             }, 500);
         }
     });
-
-=======
-       sendBtn.addEventListener('click', async () => {
-    responseDiv.textContent = '';
-    loadingDiv.style.display = 'block';
-    loadingBarContainer.style.display = 'block';
-    loadingBar.style.width = '0%';
-
-    if (
-        pdfInput.files.length === 0 ||
-        !emailInput.value.trim() ||
-        !descInput.value.trim()
-    ) {
-        loadingDiv.style.display = 'none';
-        loadingBarContainer.style.display = 'none';
-        responseDiv.textContent = 'Por favor, selecione um PDF, digite seu email e objetivo/descrição.';
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('pdf', pdfInput.files[0]);
-    formData.append('email', emailInput.value.trim());
-    formData.append('descricao', descInput.value.trim());
-
-            let progress = 0;
-            const interval = setInterval(() => {
-                if (progress < 90) {
-                    progress += 10;
-                    loadingBar.style.width = progress + '%';
-                }
-            }, 300);
-
-            try {
-                const res = await fetch('http://localhost:3000/upload', {
-                    method: 'POST',
-                    body: formData,
-                });
-
-                if (!res.ok) {
-                    throw new Error('Falha na requisição: ' + res.statusText);
-                }
-
-                const data = await res.json();
-
-                if (data.resultado) {
-                    responseDiv.textContent = data.resultado;
-                } else if (data.error) {
-                    responseDiv.textContent = 'Erro: ' + data.error;
-                } else {
-                    responseDiv.textContent = 'E-mail enviado com sucesso.';
-                }
-
-            } catch (error) {
-                console.error('Erro:', error);
-                responseDiv.textContent = 'Erro ao processar: ' + error.message;
-            } finally {
-                clearInterval(interval);
-                loadingBar.style.width = '100%';
-                setTimeout(() => {
-                    loadingDiv.style.display = 'none';
-                    loadingBarContainer.style.display = 'none';
-                }, 500);
-            }
-        });
->>>>>>> Stashed changes
-    </script>
+</script>
 </body>
 </html>
