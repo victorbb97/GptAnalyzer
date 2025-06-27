@@ -11,7 +11,7 @@ import fs from 'fs';
 import puppeteer from 'puppeteer';
 import { marked } from 'marked';
 import mongoose from 'mongoose';
-
+import AccessToken from './models/AccessToken.js';
 
 //instancia MongoDB
    mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -447,7 +447,7 @@ app.listen(port, () => {
 });
 
 //Middleware de validação de token,
-import AccessToken from './models/AccessToken.js';
+
 
 async function validateAccessToken(req, res, next) {
   const token = req.headers['x-access-token'] || req.body.token;
@@ -460,4 +460,29 @@ async function validateAccessToken(req, res, next) {
 
   next();
 }
+
+
+
+// app.post('/api/eduzz/webhook', async (req, res) => {
+//   const { status, buyer_email } = req.body;
+
+//   if (status === 'approved') {
+//     // Buscar primeiro token não usado
+//     const tokenDoc = await AccessToken.findOne({ used: false });
+
+//     if (!tokenDoc) {
+//       console.log('❌ Sem tokens disponíveis.');
+//       return res.status(500).send('Sem tokens disponíveis.');
+//     }
+
+//     tokenDoc.email = buyer_email;
+//     tokenDoc.used = true;
+//     await tokenDoc.save();
+
+//     await sendEmail(buyer_email, `✅ Obrigado pela compra! Seu código de acesso é: ${tokenDoc.token}`);
+//     console.log(`Token ${tokenDoc.token} enviado para ${buyer_email}`);
+//   }
+
+//   res.status(200).send('OK');
+// });
 
