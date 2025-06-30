@@ -12,6 +12,7 @@ import puppeteer from 'puppeteer';
 import { marked } from 'marked';
 import mongoose from 'mongoose';
 import AccessToken from './models/AccessToken.js';
+import UsedToken from './models/UsedToken.js';
 
 //instancia MongoDB
    mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -212,10 +213,7 @@ Rephrase all sections listed, following reverse chronological order. Provide the
 
     let feedback = feedbackResult.choices[0].message.content;
 
-    // Seus replaces para emojis e títulos (podem ser mantidos ou ajustados dependendo do Markdown do GPT)
-    // É importante notar que alguns desses replaces talvez não sejam mais necessários
-    // se o ChatGPT já estiver gerando os emojis e títulos diretamente no Markdown.
-    // Vamos manter por enquanto para garantir.
+    
 
     feedback = feedback
       .replace(/Olá, (.*?)! Que bom te ver por aqui!/i, '👋 Olá, $1! Que bom te ver por aqui!')
@@ -230,7 +228,7 @@ Rephrase all sections listed, following reverse chronological order. Provide the
       .replace(/## CONTACT NETWORK ANALYSIS/gi, '🔗 Estratégia de Networking')
       .replace(/## BLOCK 3: APPLICATION SUPPORT MATERIALS/gi, '📁 Materiais de Apoio à Candidatura');
 
-    // CONVERSÃO DE MARKDOWN PARA HTML AQUI:
+    // CONVERSÃO DE MARKDOWN PARA HTML 
     const htmlContentFromMarkdown = marked(feedback); // Converte o feedback (agora em Markdown) para HTML
     const imageBuffer = fs.readFileSync(path.join(__dirname, 'assets', 'HeyKodee.png'));
     const imageBase64 = imageBuffer.toString('base64');
@@ -446,22 +444,48 @@ app.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:${port}`);
 });
 
-//Middleware de validação de token,
 
+
+//Middleware de validação de token padrão sem a logica do models/UsedToken.js,
+
+// async function validateAccessToken(req, res, next) {
+//   const token = req.headers['x-access-token'] || req.body.token;
+
+//   if (!token) return res.status(401).json({ error: 'Token de acesso não informado.' });
+
+//   const foundToken = await AccessToken.findOne({ token });
+
+//   if (!foundToken) return res.status(403).json({ error: 'Token inválido.' });
+
+//   next();
+// }
+
+
+//Middleware de validação de token com o models/UsedToken.js
 
 async function validateAccessToken(req, res, next) {
   const token = req.headers['x-access-token'] || req.body.token;
-
   if (!token) return res.status(401).json({ error: 'Token de acesso não informado.' });
 
-  const foundToken = await AccessToken.findOne({ token });
+  const foundToken = await AccessToken.findOne({ token, used: false });
+  if (!foundToken) return res.status(403).json({ error: 'Token inválido ou já utilizado.' });
 
-  if (!foundToken) return res.status(403).json({ error: 'Token inválido.' });
+  // Atualiza como usado
+  foundToken.used = true;
+  await foundToken.save();
+
+  // Move para a coleção de tokens usados
+  await UsedToken.create({
+    token: foundToken.token,
+    email: req.body.email || 'não informado'
+  });
 
   next();
+  console.log('✅ Token atualizado para "used: true":', foundToken.token);
+  console.log('✅ Token movido para coleção usedtokens');
 }
 
-
+// WebHook + API EDUZ
 
 // app.post('/api/eduzz/webhook', async (req, res) => {
 //   const { status, buyer_email } = req.body;
