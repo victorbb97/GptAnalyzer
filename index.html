@@ -19,7 +19,7 @@
         <h2 class="hello-title">Olá!</h2>
         <p class="subtitle">Seja bem-vindo ao seu assistente exclusivo na busca pelo sucesso profissional!</p>
         <div class="key-box">
-            <input class="key-input" type="text" maxlength="12" placeholder="Chave de uso" />
+            <input class="key-input" type="text" maxlength="8" placeholder="Chave de uso" />
             <button class="validate-btn">validar chave de uso</button>
         </div>
         <!-- Formulário oculto para upload -->
@@ -130,20 +130,25 @@
                 body: formData,
             });
 
-            if (!res.ok) {
-                throw new Error('Falha na requisição: ' + res.statusText);
-            }
+         if (!res.ok) {
+    // Tenta pegar a mensagem de erro personalizada do backend
+    const errorData = await res.json();
+    responseDiv.textContent = errorData.error || ('Falha na requisição: ' + res.statusText);
+    loadingDiv.style.display = 'none';
+    loadingBarContainer.style.display = 'none';
+    return;
+}
 
-            const data = await res.json();
+const data = await res.json();
 
-       if (data.resultado) {
-                responseDiv.textContent = data.resultado;
-            } else if (data.error) {
-                responseDiv.textContent = 'Erro: ' + data.error;
-            } else {
-                responseDiv.textContent = 'E-mail enviado com sucesso.';
-        }
-      } catch (error) {
+if (data.resultado) {
+    responseDiv.textContent = data.resultado;
+} else if (data.error) {
+    responseDiv.textContent = 'Erro: ' + data.error;
+} else {
+    responseDiv.textContent = 'E-mail enviado com sucesso.';
+}
+        } catch (error) {
             console.error('Erro:', error);
             responseDiv.textContent = 'Erro ao processar: ' + error.message;
         } finally {
