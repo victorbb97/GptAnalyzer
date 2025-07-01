@@ -21,6 +21,7 @@
         <div class="key-box">
             <input class="key-input" type="text" maxlength="8" placeholder="Chave de uso" />
             <button class="validate-btn">validar chave de uso</button>
+            <div id="key-validation-message" class="key-validation-message"></div>
         </div>
         <!-- Formulário oculto para upload -->
         <form id="upload-form" enctype="multipart/form-data" style="display:none;">
@@ -41,7 +42,7 @@
                         H16.5z"/>
                     </svg>
                 </button>
-                <span id="file-name" style="margin-left: 10px; color: #7E04D1; font-weight: 500;"></span>
+                <span id="file-name" style="margin-left: 10px; flex: 1; color: #7E04D1; font-weight: 500;"></span>
                 <button id="send-btn" class="icon-btn" title="Enviar mensagem" type="button">
                     <!-- SVG da seta -->
                     <svg viewBox="0 0 24 24">
@@ -62,7 +63,7 @@
         © 2025 Kodee LinkedIn. Todos os direitos reservados.
     </footer>
     <script>
-    // Seletores
+    
     const pdfInput = document.getElementById('pdfFile');
     const emailInput = document.getElementById('emailInput');
     const clipBtn = document.getElementById('clip-btn');
@@ -73,6 +74,9 @@
     const loadingBar = document.getElementById('loading-bar');
     const fileNameSpan = document.getElementById('file-name');
     const descInput = document.getElementById('descInput');
+    const validateBtn = document.querySelector('.validate-btn');
+    const keyInput = document.querySelector('.key-input');
+    const keyValidationDiv = document.getElementById('key-validation-message');
 
     pdfInput.addEventListener('change', () => {
         if (pdfInput.files.length > 0) {
@@ -89,7 +93,7 @@
 
     // Enviar arquivo e email ao clicar na seta
     sendBtn.addEventListener('click', async () => {
-        responseDiv.textContent = '';
+        keyValidationDiv.textContent = '';
         loadingDiv.style.display = 'block';
         loadingBarContainer.style.display = 'block';
         loadingBar.style.width = '0%';
@@ -97,7 +101,7 @@
         if (pdfInput.files.length === 0 || !emailInput.value.trim()) {
             loadingDiv.style.display = 'none';
             loadingBarContainer.style.display = 'none';
-            responseDiv.textContent = 'Por favor, selecione um PDF e digite seu email.';
+            keyValidationDiv.textContent = 'Por favor, selecione um PDF e digite seu email.';
             return;
         }
 
@@ -105,7 +109,7 @@
         if (!token) {
             loadingDiv.style.display = 'none';
             loadingBarContainer.style.display = 'none';
-            responseDiv.textContent = 'Por favor, insira sua chave de acesso.';
+            keyValidationDiv.textContent = 'Por favor, insira sua chave de acesso.';
             return;
         }
 
@@ -133,7 +137,7 @@
          if (!res.ok) {
     // Tenta pegar a mensagem de erro personalizada do backend
     const errorData = await res.json();
-    responseDiv.textContent = errorData.error || ('Falha na requisição: ' + res.statusText);
+    keyValidationDiv.textContent = errorData.error || ('Falha na requisição: ' + res.statusText);
     loadingDiv.style.display = 'none';
     loadingBarContainer.style.display = 'none';
     return;
@@ -142,15 +146,15 @@
 const data = await res.json();
 
 if (data.resultado) {
-    responseDiv.textContent = data.resultado;
+    keyValidationDiv.textContent = data.resultado;
 } else if (data.error) {
-    responseDiv.textContent = 'Erro: ' + data.error;
+    keyValidationDiv.textContent = 'Erro: ' + data.error;
 } else {
-    responseDiv.textContent = 'E-mail enviado com sucesso.';
+    keyValidationDiv.textContent = 'E-mail enviado com sucesso.';
 }
         } catch (error) {
             console.error('Erro:', error);
-            responseDiv.textContent = 'Erro ao processar: ' + error.message;
+            keyValidationDiv.textContent = 'Erro ao processar: ' + error.message;
         } finally {
             clearInterval(interval);
             loadingBar.style.width = '100%';
@@ -158,6 +162,42 @@ if (data.resultado) {
                 loadingDiv.style.display = 'none';
                 loadingBarContainer.style.display = 'none';
             }, 500);
+        }
+    });
+
+    // Validação de chave de uso
+    validateBtn.addEventListener('click', async () => {
+        const token = keyInput.value.trim();
+        keyValidationDiv.textContent = '';
+        if (!token) {
+            keyValidationDiv.textContent = 'Por favor, insira a chave para validar.';
+            keyValidationDiv.style.color = '#D10000';
+            return;
+        }
+        validateBtn.disabled = true;
+        validateBtn.textContent = 'Validando...';
+        try {
+            const res = await fetch('http://localhost:3000/validate-token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token })
+            });
+            const data = await res.json();
+            if (res.ok && data.valid) {
+                keyValidationDiv.textContent = 'Chave válida!';
+                keyValidationDiv.style.color = '#0A8F08';
+            } else {
+                keyValidationDiv.textContent = data.error || 'Chave inválida ou já utilizada.';
+                keyValidationDiv.style.color = '#D10000';
+            }
+        } catch (err) {
+            keyValidationDiv.textContent = 'Erro ao validar chave.';
+            keyValidationDiv.style.color = '#D10000';
+        } finally {
+            validateBtn.disabled = false;
+            validateBtn.textContent = 'validar chave de uso';
         }
     });
 </script>

@@ -427,6 +427,24 @@ Com carinho, Equipe Hey, Kodee`,
   }
 });
 
+// ROTA PARA VALIDAR TOKEN NO BOTAO
+app.post('/validate-token', async (req, res) => {
+  try {
+    const token = req.body.token || req.headers['x-access-token'];
+    if (!token) {
+      return res.status(400).json({ valid: false, error: 'Token não informado.' });
+    }
+    const foundToken = await AccessToken.findOne({ token, used: false });
+    if (!foundToken) {
+      return res.status(200).json({ valid: false, error: 'Token inválido ou já utilizado.' });
+    }
+    return res.status(200).json({ valid: true, message: 'Token válido e disponível para uso.' });
+  } catch (err) {
+    console.error('Erro ao validar token:', err);
+    return res.status(500).json({ valid: false, error: 'Erro interno ao validar token.' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:${port}`);
 });

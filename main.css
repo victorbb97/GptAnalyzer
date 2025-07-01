@@ -69,7 +69,6 @@ html, body {
     margin: 0 auto;
 }
 
-.key-box,
 .message-box {
     box-sizing: border-box;
     width: 100%;
@@ -83,14 +82,33 @@ html, body {
     padding: 18px 18px 18px 18px;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .key-box {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 700px;
+    min-width: 0;
+    margin: 0 auto 28px auto;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(60,60,60,0.10);
+    border: 1px solid #e0e0e0;
+    padding: 0 18px;
+    display: flex;
     flex-direction: row;
     align-items: center;
-    height: 54px;
-    margin-bottom: 28px;
-    padding: 14px 14px 14px 18px;
+    height: 48px;
+    position: relative;
+}
+
+.key-row-align {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    gap: 10px;
 }
 
 .key-input {
@@ -101,10 +119,19 @@ html, body {
     color: #222;
     width: 140px;
     letter-spacing: 2px;
+    text-align: left;
+    height: 32px;
+    line-height: 32px;
+    padding: 0 6px;
+    box-sizing: border-box;
+    border-radius: 0;
+    border: none;
+    margin-right: auto;
+    margin-left: 0;
+    display: block;
 }
 
 .validate-btn {
-    margin-left: auto;
     background: #7E04D1;
     color: #fff;
     border: none;
@@ -114,18 +141,23 @@ html, body {
     font-weight: 500;
     cursor: pointer;
     transition: background 0.2s;
+    height: 32px;
+    margin-left: auto;
+    align-self: center;
 }
 .validate-btn:hover {
     background: #5a038f;
 }
 
-.message-box {
-    position: relative;
-    padding: 32px 24px 56px 24px;
-    box-shadow: 0 4px 24px rgba(60,60,60,0.13);
-    border-radius: 18px;
-    border: 1px solid #e0e0e0;
-    margin-bottom: 0;
+.key-validation-message {
+    position: absolute;
+    left: 18px;
+    bottom: -22px;
+    min-height: 20px;
+    margin-top: 0;
+    text-align: left;
+    width: calc(100% - 36px);
+    font-size: 0.98em;
 }
 
 .message-input {
@@ -168,8 +200,7 @@ html, body {
     text-align: left;
 }
 
-.message-actions {
-    position: absolute;
+.message-actions {    
     left: 0;
     right: 0;
     bottom: 12px;
@@ -178,6 +209,7 @@ html, body {
     align-items: center;
     padding: 0 16px;
     gap: 8px;
+    margin-top: 16px;
 }
 
 .icon-btn {
@@ -238,8 +270,12 @@ html, body {
         border: none;
     }
     .key-box {
-        padding: 10px 10px 10px 14px;
+        padding: 8px 6px 8px 10px;
         border-radius: 8px;
+        margin-bottom: 12px;
+    }
+    .key-input-row {
+        gap: 6px;
     }
 }
 
@@ -263,8 +299,12 @@ html, body {
         border: none;
     }
     .key-box {
-        padding: 8px 6px 8px 10px;
+        padding: 6px 2vw 6px 2vw;
         border-radius: 8px;
+        margin-bottom: 8px;
+    }
+    .key-input-row {
+        gap: 4px;
     }
     .gradient-title {
         font-size: 1.1rem;
