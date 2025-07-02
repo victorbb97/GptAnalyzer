@@ -116,6 +116,7 @@
         const formData = new FormData();
         formData.append('pdf', pdfInput.files[0]);
         formData.append('email', emailInput.value.trim());
+        formData.append('descricao', descInput.value.trim());
 
          let progress = 0;
         const interval = setInterval(() => {

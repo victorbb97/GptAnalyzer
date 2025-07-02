@@ -181,7 +181,7 @@ Rephrase all sections listed, following reverse chronological order. Provide the
 [INSERT USER'S PROFESSIONAL MOMENT HERE]
 
 **Professional Objective:**
-[INSERT USER'S PROFESSIONAL OBJECTIVE HERE]
+[${descricao}]
 
 **Current Resume:**
 [INSERT USER'S RESUME TEXT HERE]
