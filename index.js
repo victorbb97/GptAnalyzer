@@ -375,26 +375,19 @@ async function validateAccessToken(req, res, next) {
 // Webhook para receber notificações da Eduzz e enviar o token por email
 app.post('/api/webhook-eduzz', async (req, res) => {
   try {
-    // Log detalhado do corpo recebido
     console.log('BODY RECEBIDO:', JSON.stringify(req.body, null, 2));
 
-    // Extração dos dados do comprador (compatível com diferentes formatos)
-    const buyer_email =
-      req.body?.buyer_email || req.body?.data?.buyer?.email || null;
+    // Extrai email e nome do comprador dentro de data.buyer
+    const buyer_email = req.body?.data?.buyer?.email || null;
+    const buyer_name = req.body?.data?.buyer?.name || null;
 
-    const buyer_name =
-      req.body?.buyer_name || req.body?.data?.buyer?.name || null;
-
-    const transaction =
-      req.body?.transaction || req.body?.data?.transaction || null;
-
-    // Permitir testes da Eduzz mesmo que não enviem os dados completos
+    // Permite requisições de teste ou incompletas para validação da Eduzz
     if (!buyer_email || !buyer_name) {
       console.warn('Requisição recebida sem dados completos. Respondendo 200 para permitir validação.');
       return res.status(200).json({ message: 'Webhook de teste validado com sucesso.' });
     }
 
-    // Verifica se há token disponível no banco
+    // Busca um token disponível no banco de dados
     const tokenDisponivel = await AccessToken.findOne({ used: false });
 
     if (!tokenDisponivel) {
@@ -402,12 +395,12 @@ app.post('/api/webhook-eduzz', async (req, res) => {
       return res.status(500).json({ error: 'Nenhum token disponível no momento.' });
     }
 
-    // Marca o token como usado e associa ao comprador
+    // Atualiza o token como usado e associa ao comprador
     tokenDisponivel.email = buyer_email;
     tokenDisponivel.used = true;
     await tokenDisponivel.save();
 
-    // Configura o envio de email
+    // Configura o transporte do Nodemailer
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -416,6 +409,7 @@ app.post('/api/webhook-eduzz', async (req, res) => {
       }
     });
 
+    // Define o conteúdo do email
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: buyer_email,
@@ -431,7 +425,7 @@ Aqui está sua chave de acesso ao Bot:
 Use-a na nossa plataforma para acessar seu bot.
 
 Atenciosamente,
-Equipe HF360`
+Equipe Hey Kodee`
     };
 
     // Envia o email
