@@ -372,28 +372,80 @@ async function validateAccessToken(req, res, next) {
   console.log('✅ Token movido para coleção usedtokens');
 }
 
-// WebHook + API EDUZ
+// Webhook para receber notificações da Eduzz e enviar o token por email
+app.post('/api/webhook-eduzz', async (req, res) => {
+  try {
+    // Log detalhado do corpo recebido
+    console.log('BODY RECEBIDO:', JSON.stringify(req.body, null, 2));
 
-// app.post('/api/eduzz/webhook', async (req, res) => {
-//   const { status, buyer_email } = req.body;
+    // Extração dos dados do comprador (compatível com diferentes formatos)
+    const buyer_email =
+      req.body?.buyer_email || req.body?.data?.buyer?.email || null;
 
-//   if (status === 'approved') {
-//     // Buscar primeiro token não usado
-//     const tokenDoc = await AccessToken.findOne({ used: false });
+    const buyer_name =
+      req.body?.buyer_name || req.body?.data?.buyer?.name || null;
 
-//     if (!tokenDoc) {
-//       console.log('❌ Sem tokens disponíveis.');
-//       return res.status(500).send('Sem tokens disponíveis.');
-//     }
+    const transaction =
+      req.body?.transaction || req.body?.data?.transaction || null;
 
-//     tokenDoc.email = buyer_email;
-//     tokenDoc.used = true;
-//     await tokenDoc.save();
+    // Permitir testes da Eduzz mesmo que não enviem os dados completos
+    if (!buyer_email || !buyer_name) {
+      console.warn('Requisição recebida sem dados completos. Respondendo 200 para permitir validação.');
+      return res.status(200).json({ message: 'Webhook de teste validado com sucesso.' });
+    }
 
-//     await sendEmail(buyer_email, `✅ Obrigado pela compra! Seu código de acesso é: ${tokenDoc.token}`);
-//     console.log(`Token ${tokenDoc.token} enviado para ${buyer_email}`);
-//   }
+    // Verifica se há token disponível no banco
+    const tokenDisponivel = await AccessToken.findOne({ used: false });
 
-//   res.status(200).send('OK');
-// });
+    if (!tokenDisponivel) {
+      console.error('Sem tokens disponíveis.');
+      return res.status(500).json({ error: 'Nenhum token disponível no momento.' });
+    }
 
+    // Marca o token como usado e associa ao comprador
+    tokenDisponivel.email = buyer_email;
+    tokenDisponivel.used = true;
+    await tokenDisponivel.save();
+
+    // Configura o envio de email
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: buyer_email,
+      subject: 'Sua chave de acesso ao Bot de Análise de Currículo',
+      text: `Olá ${buyer_name},
+
+Obrigado pela sua compra!
+
+Aqui está sua chave de acesso ao Bot:
+
+🔑 CHAVE: ${tokenDisponivel.token}
+
+Use-a na nossa plataforma para acessar seu bot.
+
+Atenciosamente,
+Equipe HF360`
+    };
+
+    // Envia o email
+    await transporter.sendMail(mailOptions);
+
+    console.log(`Token ${tokenDisponivel.token} enviado para ${buyer_email}`);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Webhook processado com sucesso.'
+    });
+
+  } catch (error) {
+    console.error('Erro no webhook:', error);
+    return res.status(500).json({ error: 'Erro interno no servidor.' });
+  }
+});
