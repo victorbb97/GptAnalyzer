@@ -377,9 +377,8 @@ app.post('/api/webhook-eduzz', async (req, res) => {
   try {
     console.log('BODY RECEBIDO:', JSON.stringify(req.body, null, 2));
 
-    // Extrai email e nome do comprador dentro de data.buyer
-    const buyer_email = req.body?.data?.buyer?.email || null;
-    const buyer_name = req.body?.data?.buyer?.name || null;
+    const buyer_email = req.body?.cus_email || null;
+    const buyer_name = req.body?.cus_name || null;
 
     // Permite requisições de teste ou incompletas para validação da Eduzz
     if (!buyer_email || !buyer_name) {
@@ -387,7 +386,6 @@ app.post('/api/webhook-eduzz', async (req, res) => {
       return res.status(200).json({ message: 'Webhook de teste validado com sucesso.' });
     }
 
-    // Busca um token disponível no banco de dados
     const tokenDisponivel = await AccessToken.findOne({ used: false });
 
     if (!tokenDisponivel) {
@@ -395,12 +393,11 @@ app.post('/api/webhook-eduzz', async (req, res) => {
       return res.status(500).json({ error: 'Nenhum token disponível no momento.' });
     }
 
-    // Atualiza o token como usado e associa ao comprador
+    // Atualiza o token como usado e associa ao usuario 
     tokenDisponivel.email = buyer_email;
     tokenDisponivel.used = true;
     await tokenDisponivel.save();
 
-    // Configura o transporte do Nodemailer
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -409,7 +406,6 @@ app.post('/api/webhook-eduzz', async (req, res) => {
       }
     });
 
-    // Define o conteúdo do email
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: buyer_email,
@@ -428,7 +424,6 @@ Atenciosamente,
 Equipe Hey Kodee`
     };
 
-    // Envia o email
     await transporter.sendMail(mailOptions);
 
     console.log(`Token ${tokenDisponivel.token} enviado para ${buyer_email}`);
